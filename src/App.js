@@ -1,22 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import React, { useState, useEffect } from "react";
+import * as Realm from "realm-web";
 
 function App() {
+  const [dataSet, setDataSet] = useState([]);
+
+  const getData = async () => {
+    const app = new Realm.App({ id: "realm_test-bdcjj" });
+    const credentials = Realm.Credentials.anonymous();
+    try {
+      const user = await app.logIn(credentials);
+      const allData = await user.functions.getAllData();
+      setDataSet(allData);
+    } catch (err) {
+      console.error("Failed to log in", err);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        {dataSet.map((data, key) => {
+          return (
+            <>
+              <li>{data.name}</li>
+            </>
+          );
+        })}
       </header>
     </div>
   );
